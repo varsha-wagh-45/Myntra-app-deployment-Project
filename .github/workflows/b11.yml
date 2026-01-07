@@ -30,19 +30,19 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_URI=334741109571.dkr.ecr.ap-south-1.amazonaws.com/myntra:${{ github.sha }}
+          IMAGE_URI=334741109571.dkr.ecr.ap-south-1.amazonaws.com/b14_ecr:${{ github.sha }}
           docker build -t $IMAGE_URI .
 
       - name: Push image to Amazon ECR 
         run: |
-          IMAGE_URI=334741109571.dkr.ecr.ap-south-1.amazonaws.com/myntra:${{ github.sha }}
+          IMAGE_URI=334741109571.dkr.ecr.ap-south-1.amazonaws.com/b14_ecr:${{ github.sha }}
           docker push $IMAGE_URI
 
       - name: Verify image in ECR
         run: |
           echo "Checking if image exists in ECR..."
           aws ecr describe-images \
-            --repository-name myntra \
+            --repository-name b14_ecr \
             --image-ids imageTag=${{ github.sha }} \
             --region ap-south-1 \
           && echo "✅ Image exists in ECR" \
@@ -88,7 +88,7 @@ jobs:
 
       - name: Update deployment image to new ECR image
         run: |
-          IMAGE_URI=334741109571.dkr.ecr.ap-south-1.amazonaws.com/myntra:${{ github.sha }}
+          IMAGE_URI=334741109571.dkr.ecr.ap-south-1.amazonaws.com/b14_ecr:${{ github.sha }}
           echo "Updating k8s/app/deployment-service.yml to use $IMAGE_URI"
           sed -i "s|image: .*|image: $IMAGE_URI|" k8s/app/deployment-service.yml
           echo "--- Updated manifest ---"
