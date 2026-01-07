@@ -140,7 +140,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
 }  
 
 resource "aws_instance" "bastion" {
-  ami                         = "ami-02b8269d5e85954ef" 
+  ami                         = "ami-00ca570c1b6d79f36" 
   instance_type               = "t3.micro"
   subnet_id                   = aws_subnet.public_subnet_1.id
   vpc_security_group_ids      = [aws_security_group.web-sg.id]
@@ -171,8 +171,8 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
-resource "aws_eks_cluster" "b14-eks-cluster" {
-  name     = "b14-eks-cluster"
+resource "aws_eks_cluster" "b14_eks_cluster" {
+  name     = "b14_eks_cluster"
   role_arn = aws_iam_role.eks_cluster_role.arn
   version = "1.32"
 
@@ -184,35 +184,41 @@ resource "aws_eks_cluster" "b14-eks-cluster" {
     endpoint_private_access = true
     endpoint_public_access  = true
   }
-
+  access_config {
+    authentication_mode = "API_AND_CONFIG_MAP"
+  }
+    
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_AmazonEKSClusterPolicy,
     
   ]
 }
 
-data "aws_eks_cluster" "b14-eks-cluster" {
-  name = aws_eks_cluster.b14-eks-cluster.name
+data "aws_eks_cluster" "b14_eks_cluster" {
+  name = aws_eks_cluster.b14_eks_cluster.name
 }
-data "aws_eks_cluster_auth" "b14-eks-cluster" {
-  name = aws_eks_cluster.b14-eks-cluster.name
+data "aws_eks_cluster_auth" "b14_eks_cluster" {
+  name = aws_eks_cluster.b14_eks_cluster.name
 }
 
+  
+//add on
 resource "aws_eks_addon"  "vpc_cni" {
-    cluster_name = aws_eks_cluster.b14-eks-cluster.name
+    cluster_name = aws_eks_cluster.b14_eks_cluster.name
     addon_name   = "vpc-cni"
 }  
 resource "aws_eks_addon"  "coredns" {
-    cluster_name = aws_eks_cluster.b14-eks-cluster.name
+    cluster_name = aws_eks_cluster.b14_eks_cluster.name
     addon_name   = "coredns"
 }
 resource "aws_eks_addon"  "kube_proxy" {
-    cluster_name = aws_eks_cluster.b14-eks-cluster.name
+    cluster_name = aws_eks_cluster.b14_eks_cluster.name
     addon_name   = "kube-proxy"
 }  
 
+
 resource "aws_iam_role" "eks_node_role" {
-  name = "b14-eks-node-role"
+  name = "b14_eks_node_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -226,6 +232,7 @@ resource "aws_iam_role" "eks_node_role" {
     ]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "node_policy_1" {
   role       = aws_iam_role.eks_node_role.name
@@ -242,9 +249,13 @@ resource "aws_iam_role_policy_attachment" "node_policy_3" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-resource "aws_eks_node_group" "b14-eks-node-group" {
-  cluster_name    = aws_eks_cluster.b14-eks-cluster.name
-  node_group_name = "b14-eks-node-group"
+
+
+
+
+resource "aws_eks_node_group" "b14_eks_node_group" {
+  cluster_name    = aws_eks_cluster.b14_eks_cluster.name
+  node_group_name = "b14_eks_node_group"
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = [
     aws_subnet.private_subnet_1.id,
