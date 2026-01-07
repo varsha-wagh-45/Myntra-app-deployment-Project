@@ -1,0 +1,13 @@
+# Terraform
+**/.terraform/*
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/.terraform.lock.hcl
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / build
+node_modules/
+dist/
