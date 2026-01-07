@@ -30,7 +30,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_URI=323890959625.dkr.ecr.ap-south-1.amazonaws.com/myntra:${{ github.sha }}
+          IMAGE_URI=323890959625.dkr.ecr.ap-south-1.amazonaws.com/b14_ecr:${{ github.sha }}
           docker build -t $IMAGE_URI .
 
       - name: Push image to Amazon ECR 
